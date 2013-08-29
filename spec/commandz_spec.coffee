@@ -74,8 +74,9 @@ describe 'CommandZ', ->
 
       CommandZ.undo(3)
       CommandZ.redo(2)
+      CommandZ.execute({up: (->), down: (->)})
 
-      expect(onChangeCallback.calls.length).toBe(6)
+      expect(onChangeCallback.calls.length).toBe(7)
       CommandZ.onChange(null)
 
   describe 'integration', ->

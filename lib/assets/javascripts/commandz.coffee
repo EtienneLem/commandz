@@ -33,6 +33,7 @@ class CommandZ
     # Push new command
     @commands.push(command)
     @index = @commands.length - 1
+    this.handleChange()
 
   undo: (times=1) ->
     return unless this.status().canUndo
