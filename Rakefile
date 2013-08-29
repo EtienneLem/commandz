@@ -9,6 +9,7 @@ Bundler::GemHelper.install_tasks
 require 'uglifier'
 require 'commandz'
 require 'sprockets'
+require 'jasmine-headless-webkit'
 
 # Tasks
 desc 'Merge, compiles and minify CoffeeScript files'
@@ -20,9 +21,11 @@ task :compile do
   compile('commandz.js')
 end
 
+Jasmine::Headless::Task.new
+
 desc 'run Jasmine specs'
 task :spec do
-  system('bundle exec jasmine-headless-webkit')
+  Rake::Task['jasmine:headless'].invoke
 end
 
 # Helpers
