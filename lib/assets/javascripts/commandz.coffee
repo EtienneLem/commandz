@@ -21,14 +21,16 @@ class CommandZ
     @index = @commands.length - 1
 
   undo: (times=1) ->
-    return if @index < 0
+    return unless this.status().canUndo
+
     for i in [1..times]
       return unless @commands[@index]
       this.down(@commands[@index])
       @index--
 
   redo: (times=1) ->
-    return if @index >= @commands.length - 1
+    return unless this.status().canRedo
+
     for i in [1..times]
       return unless @commands[@index + 1]
       @index++
@@ -43,8 +45,10 @@ class CommandZ
   up:   (command) -> this.exec('up',   command)
   down: (command) -> this.exec('down', command)
 
-  # Return current command
-  status: -> @commands[@index]
+  # Return current status
+  status: ->
+    canUndo: @index > -1
+    canRedo: @index < @commands.length - 1
 
 # Singleton
 @CommandZ = new CommandZ

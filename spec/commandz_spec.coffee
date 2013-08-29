@@ -36,9 +36,11 @@ describe 'CommandZ', ->
       expect(CommandZ.commands.length).toBe(10)
       expect(CommandZ.index).toBe(9)
 
-    it 'returns current command', ->
-      currentCommand = CommandZ.status()
-      expect(currentCommand.up()).toBe(9)
+    it 'returns current status', ->
+      status = CommandZ.status()
+
+      expect(status.canUndo).toBe(true)
+      expect(status.canRedo).toBe(false)
 
     it 'overwrites upcoming commands', ->
       CommandZ.undo(3)

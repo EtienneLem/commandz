@@ -110,7 +110,7 @@ console.log(CommandZ.index)           // => 0
 ```
 
 ### status
-Return the current `COMMAND`.
+Return the current status.
 
 ```js
 CommandZ.execute({
@@ -123,7 +123,7 @@ CommandZ.execute({
   down: function() { console.log('down 2') }
 }) // => up 2
 
-console.log(CommandZ.status())        // => { up: function() { console.log('up 2') }, down: function() { console.log('down 2') } }
+console.log(CommandZ.status())        // => { canUndo: true, canRedo: false }
 console.log(CommandZ.commands.length) // => 2
 console.log(CommandZ.index)           // => 1
 ```
