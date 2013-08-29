@@ -128,6 +128,28 @@ console.log(CommandZ.commands.length) // => 2
 console.log(CommandZ.index)           // => 1
 ```
 
+### onChange
+Register a callback that will be called with the `status` every time there’s a change to the history.
+
+```js
+CommandZ.onChange(function(status) {
+  console.log(status)
+})
+
+CommandZ.execute({
+  up:   function() { 'up 1' },
+  down: function() { 'down 1' }
+}) // => { canUndo: true, canRedo: false }
+
+CommandZ.execute({
+  up:   function() { 'up 2' },
+  down: function() { 'down 2' }
+}) // => { canUndo: true, canRedo: false }
+
+CommandZ.undo() // => { canUndo: true, canRedo: true }
+CommandZ.undo() // => { canUndo: false, canRedo: true }
+```
+
 ### clear
 Clear history.
 

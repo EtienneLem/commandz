@@ -65,6 +65,19 @@ describe 'CommandZ', ->
 
       expect(CommandZ.index).toBe(0)
 
+    it 'registers onChange callback', ->
+      CommandZ.clear()
+      [0..2].forEach (i) -> CommandZ.execute({up: (-> i), down: (-> i)})
+
+      onChangeCallback = jasmine.createSpy('onChangeCallback')
+      CommandZ.onChange (status) -> onChangeCallback('test')
+
+      CommandZ.undo(3)
+      CommandZ.redo(2)
+
+      expect(onChangeCallback.calls.length).toBe(6)
+      CommandZ.onChange(null)
+
   describe 'integration', ->
     $container = null
 
