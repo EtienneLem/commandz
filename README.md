@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="http://badge.fury.io/rb/commandz"><img src="https://badge.fury.io/rb/commandz@2x.png" alt="Gem Version" height="18"></a>
+  <a href="https://travis-ci.org/EtienneLem/commandz"><img src="https://travis-ci.org/EtienneLem/commandz.png" alt="Travis build" height="18"></a>
 </p>
 
 ## Table of contents
