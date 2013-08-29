@@ -1,39 +1,39 @@
 describe 'CommandZ', ->
-  describe 'unit', ->
+  describe 'commands', ->
     it 'stores commands', ->
       [0..9].forEach (i) -> CommandZ.execute({up: (-> i), down: (-> i)})
 
-      expect(CommandZ.commands.length).toBe(10)
+      expect(CommandZ.history.length).toBe(10)
       expect(CommandZ.index).toBe(9)
 
     it 'undo', ->
       [0..3].forEach -> CommandZ.undo()
 
-      expect(CommandZ.commands.length).toBe(10)
+      expect(CommandZ.history.length).toBe(10)
       expect(CommandZ.index).toBe(5)
 
     it 'redo', ->
       CommandZ.redo()
 
-      expect(CommandZ.commands.length).toBe(10)
+      expect(CommandZ.history.length).toBe(10)
       expect(CommandZ.index).toBe(6)
 
     it 'undo many times', ->
       CommandZ.undo(3)
-      expect(CommandZ.commands.length).toBe(10)
+      expect(CommandZ.history.length).toBe(10)
       expect(CommandZ.index).toBe(3)
 
       CommandZ.undo(100)
-      expect(CommandZ.commands.length).toBe(10)
+      expect(CommandZ.history.length).toBe(10)
       expect(CommandZ.index).toBe(-1)
 
     it 'redo many times', ->
       CommandZ.redo(3)
-      expect(CommandZ.commands.length).toBe(10)
+      expect(CommandZ.history.length).toBe(10)
       expect(CommandZ.index).toBe(2)
 
       CommandZ.redo(100)
-      expect(CommandZ.commands.length).toBe(10)
+      expect(CommandZ.history.length).toBe(10)
       expect(CommandZ.index).toBe(9)
 
     it 'returns current status', ->
@@ -46,13 +46,13 @@ describe 'CommandZ', ->
       CommandZ.undo(3)
       CommandZ.execute({up: (->), down: (->)})
 
-      expect(CommandZ.commands.length).toBe(8)
+      expect(CommandZ.history.length).toBe(8)
       expect(CommandZ.index).toBe(7)
 
     it 'clears commands', ->
       CommandZ.clear()
 
-      expect(CommandZ.commands.length).toBe(0)
+      expect(CommandZ.history.length).toBe(0)
       expect(CommandZ.index).toBe(-1)
 
     it 'stores grouped commands', ->
@@ -60,8 +60,8 @@ describe 'CommandZ', ->
       CommandZ.undo()
       CommandZ.redo()
 
-      expect(CommandZ.commands.length).toBe(1)
-      expect(CommandZ.commands[0].length).toBe(2)
+      expect(CommandZ.history.length).toBe(1)
+      expect(CommandZ.history[0].length).toBe(2)
 
       expect(CommandZ.index).toBe(0)
 
@@ -84,9 +84,10 @@ describe 'CommandZ', ->
 
     beforeEach ->
       CommandZ.clear()
-      loadFixtures('spec_container.html')
 
+      loadFixtures('spec_container.html')
       $container = $('#spec-container')
+
       [0..4].forEach ->
         $test = $('<div class="foo"></div>')
         CommandZ.execute

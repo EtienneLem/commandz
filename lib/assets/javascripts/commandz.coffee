@@ -8,7 +8,7 @@ class CommandZ
     this.keyboardShortcuts(true)
 
   clear: ->
-    @commands = []
+    @history = []
     @index = -1
 
   keyboardShortcuts: (enable=true) ->
@@ -25,23 +25,23 @@ class CommandZ
   execute: (command) ->
     this.up(command)
 
-    # Overwrites following commands (if @index < @commands.length)
-    if (@index < @commands.length - 1)
-      difference = (@commands.length - @index) - 1
-      @commands.splice(-difference)
+    # Overwrites upcoming history items (if @index < @history.length)
+    if (@index < @history.length - 1)
+      difference = (@history.length - @index) - 1
+      @history.splice(-difference)
 
     # Push new command
-    @commands.push(command)
-    @index = @commands.length - 1
+    @history.push(command)
+    @index = @history.length - 1
     this.handleChange()
 
   undo: (times=1) ->
     return unless this.status().canUndo
 
     for i in [1..times]
-      return unless @commands[@index]
+      return unless @history[@index]
 
-      this.down(@commands[@index])
+      this.down(@history[@index])
       @index--
 
       this.handleChange()
@@ -50,10 +50,10 @@ class CommandZ
     return unless this.status().canRedo
 
     for i in [1..times]
-      return unless @commands[@index + 1]
+      return unless @history[@index + 1]
 
       @index++
-      this.up(@commands[@index])
+      this.up(@history[@index])
 
       this.handleChange()
 
@@ -78,7 +78,7 @@ class CommandZ
   # Return current status
   status: ->
     canUndo: @index > -1
-    canRedo: @index < @commands.length - 1
+    canRedo: @index < @history.length - 1
 
 # Singleton
 @CommandZ = new CommandZ
