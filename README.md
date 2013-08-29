@@ -13,6 +13,20 @@
   <a href="http://badge.fury.io/rb/commandz"><img src="https://badge.fury.io/rb/commandz@2x.png" alt="Gem Version" height="18"></a>
 </p>
 
+## Table of contents
+- [API](#api)
+  - [CommandZ.execute](#execute)
+  - [CommandZ.undo](#undo)
+  - [CommandZ.redo](#redo)
+  - [CommandZ.status](#status)
+  - [CommandZ.onChange](#onchange)
+  - [CommandZ.clear](#clear)
+- [DOM Example](#dom-example)
+- [Setup](#setup)
+  - [Rails](#rails)
+  - [Other](#other)
+- [Tests](#tests)
+
 ## API
 #### Glossary
 ```js
