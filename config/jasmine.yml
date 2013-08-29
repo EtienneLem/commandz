@@ -1,0 +1,10 @@
+src_files:
+  - "**/*"
+helpers:
+  - helpers/**/*
+spec_files:
+  - "**/*_spec.*"
+src_dir: 
+  - lib
+  - vendor
+spec_dir: spec
