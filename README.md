@@ -21,6 +21,7 @@
   - [CommandZ.status](#status)
   - [CommandZ.onChange](#onchange)
   - [CommandZ.clear](#clear)
+  - [CommandZ.keyboardShortcuts](#keyboardshortcuts)
 - [DOM Example](#dom-example)
 - [Setup](#setup)
   - [Rails](#rails)
@@ -183,6 +184,15 @@ CommandZ.clear()
 console.log(CommandZ.status())        // => undefined
 console.log(CommandZ.commands.length) // => 0
 console.log(CommandZ.index)           // => -1
+```
+
+### keyboardShortcuts
+Enable or disable `CMD+Z` & `CMD+SHIFT+Z` keyboard shortcuts. These shortcuts are enabled by default.<br>
+Will only `undo()` & `redo()` if the current selected element is not an input so that it doesn’t prevent your OS default behavior.
+
+```js
+CommandZ.keyboardShortcuts(true) // default
+CommandZ.keyboardShortcuts(false)
 ```
 
 ## DOM Example

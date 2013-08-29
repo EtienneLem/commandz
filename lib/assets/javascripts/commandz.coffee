@@ -3,11 +3,24 @@ class CommandZ
   constructor: ->
     @VERSION = '0.0.1'
     @changeCallback = null
+
     this.clear()
+    this.keyboardShortcuts(true)
 
   clear: ->
     @commands = []
     @index = -1
+
+  keyboardShortcuts: (enable=true) ->
+    addOrRemove = if enable then 'addEventListener' else 'removeEventListener'
+    document[addOrRemove]('keypress', this.handleKeyboard)
+
+  handleKeyboard: (e) =>
+    return if document.activeElement.nodeName is 'INPUT'
+    return unless e.keyCode is 122 and e.metaKey is true
+
+    e.preventDefault()
+    if e.shiftKey then this.redo() else this.undo()
 
   execute: (command) ->
     this.up(command)
