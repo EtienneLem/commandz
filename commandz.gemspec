@@ -5,8 +5,8 @@ Gem::Specification.new do |s|
   s.version     = CommandZ::VERSION
   s.authors     = ['Etienne Lemay']
   s.email       = ['etienne@heliom.ca']
-  s.homepage    = 'https://github.com/EtienneLem/commandz'
-  s.summary     = 'CommandZ undo and redo commands'
+  s.homepage    = 'http://etiennelem.github.io/commandz'
+  s.summary     = '⌘Z add commands history support to your web app'
   s.license     = 'MIT'
 
   s.files      = `git ls-files`.split($/)
