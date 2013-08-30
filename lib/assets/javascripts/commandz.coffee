@@ -2,7 +2,7 @@ class CommandZ
 
   constructor: ->
     @VERSION = '0.0.3'
-    @changeCallback = null
+    @statusChangeCallback = null
 
     this.clear()
     this.keyboardShortcuts(true)
@@ -33,7 +33,8 @@ class CommandZ
     # Push new command
     @history.push(command)
     @index = @history.length - 1
-    this.handleChange()
+
+    this.handleStatusChange()
 
   undo: (times=1) ->
     return unless this.status().canUndo
@@ -44,7 +45,7 @@ class CommandZ
       this.down(@history[@index])
       @index--
 
-      this.handleChange()
+      this.handleStatusChange()
 
   redo: (times=1) ->
     return unless this.status().canRedo
@@ -55,7 +56,7 @@ class CommandZ
       @index++
       this.up(@history[@index])
 
-      this.handleChange()
+      this.handleStatusChange()
 
   # Execute up/down on a command
   # command can be a group of commands or a single command
@@ -66,16 +67,15 @@ class CommandZ
   up:   (command) -> this.exec('up',   command)
   down: (command) -> this.exec('down', command)
 
-  # Register onChange callback
-  onChange: (callback) ->
-    @changeCallback = callback
-    this.handleChange()
+  # Status management
+  onStatusChange: (callback) ->
+    @statusChangeCallback = callback
+    this.handleStatusChange()
 
-  handleChange: ->
-    return unless @changeCallback
-    @changeCallback(this.status())
+  handleStatusChange: ->
+    return unless @statusChangeCallback
+    @statusChangeCallback(this.status())
 
-  # Return current status
   status: ->
     canUndo: @index > -1
     canRedo: @index < @history.length - 1
