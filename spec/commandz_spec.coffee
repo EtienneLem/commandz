@@ -77,6 +77,41 @@ describe 'CommandZ', ->
       expect(onStatusChangeCallback.calls.length).toBe(7)
       CommandZ.onStatusChange(null)
 
+  describe 'storage', ->
+    data = null
+
+    beforeEach ->
+      CommandZ.clear()
+      CommandZ.onStorageChange(null)
+      [1..3].forEach (i) -> CommandZ.store({ width: i * 100, height: i * 100 })
+
+    it 'stores data', ->
+      expect(CommandZ.history.length).toBe(3)
+      expect(CommandZ.index).toBe(2)
+
+    it 'undo', ->
+      CommandZ.onStorageChange (storageData) -> data = storageData
+      CommandZ.undo()
+
+      expect(data).toEqual({ width: 200, height: 200 })
+
+    it 'redo', ->
+      CommandZ.undo()
+      CommandZ.onStorageChange (storageData) -> data = storageData
+      CommandZ.redo()
+
+      expect(data).toEqual({ width: 300, height: 300 })
+
+    it 'undo and redo many times', ->
+      spyOn(CommandZ, 'sendData')
+
+      CommandZ.undo(2)
+      CommandZ.redo(2)
+      expect(CommandZ.sendData.calls.length).toBe(4)
+
+      CommandZ.redo(100)
+      expect(CommandZ.sendData.calls.length).toBe(4)
+
   describe 'integration', ->
     $container = null
 
@@ -131,3 +166,28 @@ describe 'CommandZ', ->
 
       CommandZ.undo()
       expect($container.html()).toBe('')
+
+    it 'restores states with stored data', ->
+      img = new Image
+      $container.html(img)
+
+      CommandZ.onStorageChange (data) ->
+        img.width = data.width
+        img.height = data.height
+
+      img.width = 100
+      img.height = 100
+
+      [1..4].forEach (i) -> CommandZ.store({ width: i * 100, height: i * 100 })
+
+      CommandZ.undo(2)
+      expect(img.width).toBe(200)
+
+      CommandZ.redo()
+      expect(img.width).toBe(300)
+
+      CommandZ.redo(100)
+      expect(img.width).toBe(400)
+
+      CommandZ.undo(100)
+      expect(img.width).toBe(100)

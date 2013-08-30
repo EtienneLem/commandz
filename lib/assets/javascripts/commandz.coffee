@@ -3,6 +3,7 @@ class CommandZ
   constructor: ->
     @VERSION = '0.0.3'
     @statusChangeCallback = null
+    @storageChangeCallback = null
 
     this.clear()
     this.keyboardShortcuts(true)
@@ -22,12 +23,19 @@ class CommandZ
     e.preventDefault()
     if e.shiftKey then this.redo() else this.undo()
 
-  # Execute and store a { up: ->, down: -> } command
+  # Execute and store commands as { command: {up: ->, down: ->} }
   execute: (command) ->
     historyItem = {}
     historyItem.command = command
 
-    this.up(historyItem)
+    this.up(command)
+    this.addToHistory(historyItem)
+
+  # Store data as { data: … }
+  store: (data) ->
+    historyItem = {}
+    historyItem.data = data
+
     this.addToHistory(historyItem)
 
   # History management
@@ -48,8 +56,14 @@ class CommandZ
     for i in [1..times]
       return unless @history[@index]
 
-      this.down(@history[@index])
+      historyItem = @history[@index]
+      this.down(command) if command = historyItem.command
+
+      # Has to be after a command item, but before a data item
       @index--
+
+      if historyItem = @history[@index]
+        this.sendData(data) if data = historyItem.data
 
       this.handleStatusChange()
 
@@ -59,19 +73,32 @@ class CommandZ
     for i in [1..times]
       return unless @history[@index + 1]
 
+      # Has to be before both a command and a data item
       @index++
-      this.up(@history[@index])
+
+      historyItem = @history[@index]
+      this.up(command) if command = historyItem.command
+      this.sendData(data) if data = historyItem.data
 
       this.handleStatusChange()
 
-  # Execute up/down on a command
+  # Execute up/down action on a command
   # command can be a group of commands or a single command
   exec: (action, command) ->
     return command[action]() unless command instanceof Array
     c[action]() for c in command
 
-  up:   (historyItem) -> this.exec('up',   historyItem.command)
-  down: (historyItem) -> this.exec('down', historyItem.command)
+  up:   (command) -> this.exec('up',   command)
+  down: (command) -> this.exec('down', command)
+
+  # Send current history item data
+  sendData: (data) ->
+    return unless @storageChangeCallback
+    @storageChangeCallback(data)
+
+  # Storage management
+  onStorageChange: (callback) ->
+    @storageChangeCallback = callback
 
   # Status management
   onStatusChange: (callback) ->
