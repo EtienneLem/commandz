@@ -57,11 +57,9 @@ describe 'CommandZ', ->
 
     it 'stores grouped commands', ->
       CommandZ.execute([{up: (->), down: (->)}, {up: (->), down: (->)}])
-      CommandZ.undo()
-      CommandZ.redo()
 
       expect(CommandZ.history.length).toBe(1)
-      expect(CommandZ.history[0].length).toBe(2)
+      expect(CommandZ.history[0].command.length).toBe(2)
 
       expect(CommandZ.index).toBe(0)
 

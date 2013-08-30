@@ -22,16 +22,22 @@ class CommandZ
     e.preventDefault()
     if e.shiftKey then this.redo() else this.undo()
 
+  # Execute and store a { up: ->, down: -> } command
   execute: (command) ->
-    this.up(command)
+    historyItem = {}
+    historyItem.command = command
 
-    # Overwrites upcoming history items (if @index < @history.length)
-    if (@index < @history.length - 1)
+    this.up(historyItem)
+    this.addToHistory(historyItem)
+
+  # History management
+  addToHistory: (historyItem) ->
+    # Overwrite upcoming history items
+    if @index < @history.length - 1
       difference = (@history.length - @index) - 1
       @history.splice(-difference)
 
-    # Push new command
-    @history.push(command)
+    @history.push(historyItem)
     @index = @history.length - 1
 
     this.handleStatusChange()
@@ -64,8 +70,8 @@ class CommandZ
     return command[action]() unless command instanceof Array
     c[action]() for c in command
 
-  up:   (command) -> this.exec('up',   command)
-  down: (command) -> this.exec('down', command)
+  up:   (historyItem) -> this.exec('up',   historyItem.command)
+  down: (historyItem) -> this.exec('down', historyItem.command)
 
   # Status management
   onStatusChange: (callback) ->
