@@ -13,9 +13,9 @@ class CommandZ
 
   keyboardShortcuts: (enable=true) ->
     addOrRemove = if enable then 'addEventListener' else 'removeEventListener'
-    document[addOrRemove]('keypress', this.handleKeyboard)
+    document[addOrRemove]('keypress', this.handleKeypress)
 
-  handleKeyboard: (e) =>
+  handleKeypress: (e) =>
     return if document.activeElement.nodeName is 'INPUT'
     return unless e.keyCode is 122 and e.metaKey is true
 
