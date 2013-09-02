@@ -3,13 +3,16 @@ class CommandZ
   constructor: ->
     @VERSION = '0.0.3'
 
+    this.reset()
+    this.keyboardShortcuts(true)
+
+  reset: ->
+    this.clear()
+
     @statusChangeCallback = null
     @storageChangeCallback = null
     @thresholdTimer = null
     @threshold = 0
-
-    this.clear()
-    this.keyboardShortcuts(true)
 
   clear: ->
     @history = []

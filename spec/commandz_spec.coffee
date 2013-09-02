@@ -81,10 +81,7 @@ describe 'CommandZ', ->
     data = null
 
     beforeEach ->
-      CommandZ.clear()
-      CommandZ.onStorageChange(null)
-      CommandZ.setThreshold(0)
-
+      CommandZ.reset()
       [1..3].forEach (i) -> CommandZ.store({ width: i * 100, height: i * 100 })
 
     it 'stores data', ->
@@ -130,8 +127,7 @@ describe 'CommandZ', ->
     $container = null
 
     beforeEach ->
-      CommandZ.clear()
-      CommandZ.setThreshold(0)
+      CommandZ.reset()
 
       loadFixtures('spec_container.html')
       $container = $('#spec-container')
