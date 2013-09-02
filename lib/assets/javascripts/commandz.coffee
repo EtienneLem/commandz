@@ -24,7 +24,7 @@ class CommandZ
 
   handleKeypress: (e) =>
     return if document.activeElement.nodeName is 'INPUT'
-    return unless e.keyCode is 122 and e.metaKey is true
+    return unless (e.which is 122 and e.metaKey is true || e.which is 26 and e.ctrlKey is true)
 
     e.preventDefault()
     if e.shiftKey then this.redo() else this.undo()
