@@ -2,8 +2,11 @@ class CommandZ
 
   constructor: ->
     @VERSION = '0.0.3'
+
     @statusChangeCallback = null
     @storageChangeCallback = null
+    @thresholdTimer = null
+    @threshold = 0
 
     this.clear()
     this.keyboardShortcuts(true)
@@ -63,7 +66,7 @@ class CommandZ
       @index--
 
       if historyItem = @history[@index]
-        this.sendData(data) if data = historyItem.data
+        this.handleData(data) if data = historyItem.data
 
       this.handleStatusChange()
 
@@ -78,7 +81,7 @@ class CommandZ
 
       historyItem = @history[@index]
       this.up(command) if command = historyItem.command
-      this.sendData(data) if data = historyItem.data
+      this.handleData(data) if data = historyItem.data
 
       this.handleStatusChange()
 
@@ -92,6 +95,14 @@ class CommandZ
   down: (command) -> this.exec('down', command)
 
   # Send current history item data
+  handleData: (data) ->
+    return this.sendData(data) unless @threshold > 0
+
+    clearTimeout(@thresholdTimer)
+    @thresholdTimer = setTimeout =>
+      this.sendData(data)
+    , @threshold
+
   sendData: (data) ->
     return unless @storageChangeCallback
     @storageChangeCallback(data)
@@ -99,6 +110,9 @@ class CommandZ
   # Storage management
   onStorageChange: (callback) ->
     @storageChangeCallback = callback
+
+  setThreshold: (threshold) ->
+    @threshold = threshold
 
   # Status management
   onStatusChange: (callback) ->

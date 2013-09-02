@@ -83,6 +83,8 @@ describe 'CommandZ', ->
     beforeEach ->
       CommandZ.clear()
       CommandZ.onStorageChange(null)
+      CommandZ.setThreshold(0)
+
       [1..3].forEach (i) -> CommandZ.store({ width: i * 100, height: i * 100 })
 
     it 'stores data', ->
@@ -112,11 +114,24 @@ describe 'CommandZ', ->
       CommandZ.redo(100)
       expect(CommandZ.sendData.calls.length).toBe(4)
 
+    it 'has a threshold', ->
+      spyOn(CommandZ, 'sendData')
+
+      CommandZ.setThreshold(500)
+      CommandZ.undo(100)
+
+      waits(450)
+      runs -> expect(CommandZ.sendData.calls.length).toBe(0)
+
+      waits(100)
+      runs -> expect(CommandZ.sendData.calls.length).toBe(1)
+
   describe 'integration', ->
     $container = null
 
     beforeEach ->
       CommandZ.clear()
+      CommandZ.setThreshold(0)
 
       loadFixtures('spec_container.html')
       $container = $('#spec-container')
