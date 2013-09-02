@@ -1,3 +1,6 @@
+## [v0.1.1](https://github.com/EtienneLem/commandz/tree/v0.1.1)
+- Add `CTRL+Z` & `CTRL+SHIFT+Z` keyboard shortcuts
+
 ## [v0.1.0](https://github.com/EtienneLem/commandz/tree/v0.1.0)
 - Rename `CommandZ.commands` -> `CommandZ.history`
 - Rename `CommandZ.onChange` -> `CommandZ.onStatusChange`
