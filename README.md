@@ -16,14 +16,19 @@
 
 ## Table of contents
 - [API](#api)
-  - [CommandZ.execute](#execute)
-  - [CommandZ.undo](#undo)
-  - [CommandZ.redo](#redo)
-  - [CommandZ.status](#status)
-  - [CommandZ.onChange](#onchange)
-  - [CommandZ.clear](#clear)
-  - [CommandZ.keyboardShortcuts](#keyboardshortcuts)
+  - [execute](#execute) | [store](#store)
+  - [undo (commands)](#undo-commands) | [undo (storage)](#undo-storage)
+  - [redo (commands)](#redo-commands) | [redo (storage)](#redo-storage)
+  - [setThreshold (storage only)](#setthreshold-storage-only)
+  - [status](#status)
+  - [onStatusChange](#onstatuschange)
+  - [onStorageChange](#onstoragechange)
+  - [clear](#clear)
+  - [reset](#reset)
+  - [keyboardShortcuts](#keyboardshortcuts)
 - [DOM Example](#dom-example)
+  - [Commands](#commands)
+  - [Storage](#storage)
 - [Setup](#setup)
   - [Rails](#rails)
   - [Other](#other)
@@ -39,8 +44,9 @@ COMMAND: {
 }
 ```
 
-### execute
-Receive `COMMAND` or `COMMANDS` and execute `COMMAND.up()`.
+### #execute
+Receive `COMMAND` or `COMMANDS` and execute `COMMAND.up()`.<br>
+Store commands as a `{ command: COMMAND }` object in the history array.
 
 **Single command per history item**<br>
 Store one history item per `COMMAND`.
@@ -79,8 +85,8 @@ console.log(CommandZ.commands.length) // => 1
 console.log(CommandZ.index)           // => 0
 ```
 
-### undo
-Call `COMMAND.down()` and set the index to the previous command.
+### #undo (commands)
+Call `COMMAND.down()` and set the index to the previous history item.
 
 ```js
 CommandZ.execute({
@@ -104,8 +110,8 @@ console.log(CommandZ.commands.length) // => 2
 console.log(CommandZ.index)           // => -1
 ```
 
-### redo
-Set the index to the next command and call `COMMAND.up()`.
+### #redo (commands)
+Set the index to the next history item and call `COMMAND.up()`.
 
 ```js
 CommandZ.execute({
@@ -125,7 +131,73 @@ console.log(CommandZ.commands.length) // => 2
 console.log(CommandZ.index)           // => 0
 ```
 
-### status
+### #store
+Store data as a `{ data: … }` object in the history array.
+
+```js
+CommandZ.store({ width: 100, height: 100 })
+```
+
+### #undo (storage)
+Set the index to the previous history item and send data via [`CommandZ.onStorageChange`](#onstoragechange).
+
+```js
+CommandZ.onStorageChange(function(data) {
+  console.log(data)
+})
+
+CommandZ.store({ width: 100, height: 100 })
+CommandZ.undo()
+
+console.log(CommandZ.commands.length) // => 1
+console.log(CommandZ.index)           // => -1
+
+CommandZ.store({ width: 100, height: 100 })
+CommandZ.store({ width: 200, height: 200 })
+CommandZ.undo() # => { width: 100, height: 100 }
+
+console.log(CommandZ.commands.length) // => 2
+console.log(CommandZ.index)           // => 0
+```
+
+### #redo (storage)
+Set the index to the next history item and send data via [`CommandZ.onStorageChange`](#onstoragechange).
+
+```js
+CommandZ.onStorageChange(function(data) {
+  console.log(data)
+})
+
+CommandZ.store({ width: 100, height: 100 })
+CommandZ.store({ width: 200, height: 200 })
+CommandZ.undo() # => { width: 100, height: 100 }
+CommandZ.redo() # => { width: 200, height: 200 }
+
+console.log(CommandZ.commands.length) // => 2
+console.log(CommandZ.index)           // => 1
+```
+
+### #setThreshold (storage only)
+Unlike commands, you can allow your users to spam the `CMD+Z` button without restoring every states at every steps.<br>
+Threshold is set in `milliseconds`.
+
+```js
+CommandZ.setThreshold(500)
+CommandZ.onStorageChange(function(data) {
+  console.log(data)
+})
+
+CommandZ.store({ width: 100, height: 100 })
+CommandZ.store({ width: 200, height: 200 })
+CommandZ.store({ width: 300, height: 300 })
+
+CommandZ.undo(100)
+
+// Wait 500ms
+// => { width: 100, height: 100 }
+```
+
+### #status
 Return the current status.
 
 ```js
@@ -144,11 +216,11 @@ console.log(CommandZ.commands.length) // => 2
 console.log(CommandZ.index)           // => 1
 ```
 
-### onChange
+### #onStatusChange
 Register a callback that will be called with the `status` every time there’s a change to the history.
 
 ```js
-CommandZ.onChange(function(status) {
+CommandZ.onStatusChange(function(status) {
   console.log(status)
 })
 
@@ -166,7 +238,21 @@ CommandZ.undo() // => { canUndo: true, canRedo: true }
 CommandZ.undo() // => { canUndo: false, canRedo: true }
 ```
 
-### clear
+### #onStorageChange
+Register a callback that will be called with the `data` on undo/redo.
+
+```js
+CommandZ.onStorageChange(function(data) {
+  console.log(data)
+})
+
+CommandZ.store({ width: 100, height: 100 })
+CommandZ.store({ width: 200, height: 200 })
+
+CommandZ.undo() // => { width: 100, height: 100 }
+```
+
+### #clear
 Clear history.
 
 ```js
@@ -187,7 +273,10 @@ console.log(CommandZ.commands.length) // => 0
 console.log(CommandZ.index)           // => -1
 ```
 
-### keyboardShortcuts
+### #reset
+Clear history, remove callbacks and set threshold to 0.
+
+### #keyboardShortcuts
 Enable or disable `CMD+Z` & `CMD+SHIFT+Z` keyboard shortcuts. These shortcuts are enabled by default.<br>
 Will only `undo()` & `redo()` if the current selected element is not an input so that it doesn’t prevent your OS default behavior.
 
@@ -197,6 +286,7 @@ CommandZ.keyboardShortcuts(false)
 ```
 
 ## DOM Example
+### Commands
 ```js
 // This example requires jQuery or Zepto
 $container = $('<div></div>')
@@ -232,6 +322,35 @@ CommandZ.execute({
 console.log($container.html())        // => <i>1</i><i>2</i><i>1337</i>
 console.log(CommandZ.commands.length) // => 3
 console.log(CommandZ.index)           // => 2
+```
+
+### Storage
+```js
+// This example requires jQuery or Zepto
+$container = $('<div></div>')
+
+img = new Image
+$container.html(img)
+
+// Register undo/redo callback
+CommandZ.onStorageChange = function(data) {
+  img.width = data.width
+  img.height = data.height
+}
+
+img.width = 100
+img.height = 100
+
+// Lets store some states
+[1, 2, 3, 4].forEach(function(i) {
+  CommandZ.store({ width: i * 100, height: i * 100 })
+})
+
+CommandZ.undo(2)
+console.log(img.width) // => 200
+
+CommandZ.redo()
+console.log(img.width) // => 300
 ```
 
 ## Setup
