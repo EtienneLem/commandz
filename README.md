@@ -154,7 +154,7 @@ console.log(CommandZ.index)           // => -1
 
 CommandZ.store({ width: 100, height: 100 })
 CommandZ.store({ width: 200, height: 200 })
-CommandZ.undo() # => { width: 100, height: 100 }
+CommandZ.undo() // => { width: 100, height: 100 }
 
 console.log(CommandZ.commands.length) // => 2
 console.log(CommandZ.index)           // => 0
@@ -170,8 +170,8 @@ CommandZ.onStorageChange(function(data) {
 
 CommandZ.store({ width: 100, height: 100 })
 CommandZ.store({ width: 200, height: 200 })
-CommandZ.undo() # => { width: 100, height: 100 }
-CommandZ.redo() # => { width: 200, height: 200 }
+CommandZ.undo() // => { width: 100, height: 100 }
+CommandZ.redo() // => { width: 200, height: 200 }
 
 console.log(CommandZ.commands.length) // => 2
 console.log(CommandZ.index)           // => 1
