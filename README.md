@@ -360,7 +360,7 @@ console.log(img.width) // => 300
 3. Restart your server and `CMD+Z` - `CMD+SHIFT+Z` away!
 
 ### Other
-Download and include [commandz.min.js](https://raw.github.com/EtienneLem/commandz/master/commandz.min.js) in your HTML pages.
+Download and include [commandz.min.js](https://raw.github.com/EtienneLem/commandz/master/commandz.min.js) in your HTML pages. CommandZ is also hosted on [cdnjs.com](http://cdnjs.com).
 
 ## Tests
 Run the `rake spec` task or `bundle exec guard` for continuous testing.
