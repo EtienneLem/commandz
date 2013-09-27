@@ -20,11 +20,11 @@ class CommandZ
 
   keyboardShortcuts: (enable=true) ->
     addOrRemove = if enable then 'addEventListener' else 'removeEventListener'
-    document[addOrRemove]('keypress', this.handleKeypress)
+    document[addOrRemove]('keydown', this.handleKeypress)
 
   handleKeypress: (e) =>
     return if document.activeElement.nodeName is 'INPUT'
-    return unless (e.which is 122 and e.metaKey is true || e.which is 26 and e.ctrlKey is true)
+    return unless (e.which is 90 and e.metaKey is true || e.which is 26 and e.ctrlKey is true)
 
     e.preventDefault()
     if e.shiftKey then this.redo() else this.undo()
