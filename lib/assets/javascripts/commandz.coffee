@@ -1,7 +1,7 @@
 class CommandZ
 
   constructor: ->
-    @VERSION = '0.1.1'
+    @VERSION = '0.1.2'
 
     this.reset()
     this.keyboardShortcuts(true)

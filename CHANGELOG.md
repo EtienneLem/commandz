@@ -1,3 +1,6 @@
+## [v0.1.2](https://github.com/EtienneLem/commandz/tree/v0.1.2)
+- Capture keydown instead of keypress. [Fixes Chrome shortcut]
+
 ## [v0.1.1](https://github.com/EtienneLem/commandz/tree/v0.1.1)
 - Add `CTRL+Z` & `CTRL+SHIFT+Z` keyboard shortcuts
 
