@@ -1,5 +1,4 @@
 class CommandZ
-
   constructor: ->
     @VERSION = '0.1.2'
 
@@ -127,8 +126,11 @@ class CommandZ
     @statusChangeCallback(this.status())
 
   status: ->
-    canUndo: @index > -1
+    first = @history[0]
+    return { canUndo: false, canRedo: false } unless @history.length
+
+    canUndo: if !!first.data then @index > 0 else @index > -1
     canRedo: @index < @history.length - 1
 
-# Singleton
-@CommandZ = new CommandZ
+# Export singleton
+module.exports = new CommandZ
