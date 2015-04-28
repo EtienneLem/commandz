@@ -2,7 +2,7 @@
 { delay } = helpers
 
 describe 'CommandZ', ->
-  describe 'commands', ->
+  describe 'actions', ->
     beforeEach ->
       @spies = []
       [0..9].forEach (i) =>
@@ -18,7 +18,7 @@ describe 'CommandZ', ->
 
         calls
 
-    it 'stores commands', ->
+    it 'stores actions', ->
       expect(CommandZ.history.length).to.equal(10)
       expect(CommandZ.index).to.equal(9)
 
@@ -138,21 +138,21 @@ describe 'CommandZ', ->
       expect(status.canUndo).to.equal(true)
       expect(status.canRedo).to.equal(false)
 
-    it 'overwrites upcoming commands', ->
+    it 'overwrites upcoming actions', ->
       CommandZ.undo(3)
       CommandZ.execute({ up: (->), down: (->) })
 
       expect(CommandZ.history.length).to.equal(8)
       expect(CommandZ.index).to.equal(7)
 
-    it 'clears commands', ->
+    it 'clears history', ->
       expect(CommandZ.history.length).to.equal(10)
       CommandZ.clear()
 
       expect(CommandZ.history.length).to.equal(0)
       expect(CommandZ.index).to.equal(-1)
 
-    it 'stores grouped commands', ->
+    it 'stores grouped actions', ->
       CommandZ.clear()
       CommandZ.execute [
         { up: (->), down: (->) }
@@ -160,7 +160,7 @@ describe 'CommandZ', ->
       ]
 
       expect(CommandZ.history.length).to.equal(1)
-      expect(CommandZ.history[0].command.length).to.equal(2)
+      expect(CommandZ.history[0].grouped).to.be.true
 
       expect(CommandZ.index).to.equal(0)
 
@@ -176,8 +176,6 @@ describe 'CommandZ', ->
       CommandZ.onStatusChange(null)
 
   describe 'storage', ->
-    data = null
-
     beforeEach ->
       CommandZ.reset()
       [1..3].forEach (i) -> CommandZ.store({ width: i * 100, height: i * 100 })
@@ -187,17 +185,19 @@ describe 'CommandZ', ->
       expect(CommandZ.index).to.equal(2)
 
     it 'undo', ->
-      CommandZ.onStorageChange (storageData) -> data = storageData
+      spy = simple.spy(->)
+      CommandZ.onStorageChange(spy)
       CommandZ.undo()
 
-      expect(data).to.deep.equal({ width: 200, height: 200 })
+      expect(spy.firstCall.args[0]).to.deep.equal({ width: 200, height: 200 })
 
     it 'redo', ->
       CommandZ.undo()
-      CommandZ.onStorageChange (storageData) -> data = storageData
+      spy = simple.spy(->)
+      CommandZ.onStorageChange(spy)
       CommandZ.redo()
 
-      expect(data).to.deep.equal({ width: 300, height: 300 })
+      expect(spy.firstCall.args[0]).to.deep.equal({ width: 300, height: 300 })
 
     it 'undo and redo many times', ->
       simple.mock(CommandZ, 'sendData')
@@ -212,11 +212,11 @@ describe 'CommandZ', ->
     it 'has a threshold', (done) ->
       simple.mock(CommandZ, 'sendData')
 
-      CommandZ.setThreshold(50)
+      CommandZ.setThreshold(10)
       CommandZ.undo(100)
 
-      delay 45, ->
+      delay 5, ->
         expect(CommandZ.sendData.calls.length).to.equal(0)
 
-        delay 10, done, ->
+        delay 6, done, ->
           expect(CommandZ.sendData.calls.length).to.equal(1)

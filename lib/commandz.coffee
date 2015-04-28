@@ -1,4 +1,8 @@
-class CommandZ
+# Namespace
+CommandZ = {}
+
+# Client - Public API Singleton
+class CommandZ.Client
   constructor: ->
     @VERSION = '0.2.0'
 
@@ -28,20 +32,17 @@ class CommandZ
     e.preventDefault()
     if e.shiftKey then this.redo() else this.undo()
 
-  # Execute and store commands as { command: {up: ->, down: ->} }
-  execute: (command) ->
-    historyItem = {}
-    historyItem.command = command
+  # Execute and store actions
+  execute: (action) ->
+    action = new CommandZ.Action(action)
+    action.up()
 
-    this.up(command)
-    this.addToHistory(historyItem)
+    this.addToHistory(action)
 
-  # Store data as { data: … }
+  # Store data
   store: (data) ->
-    historyItem = {}
-    historyItem.data = data
-
-    this.addToHistory(historyItem)
+    data = new CommandZ.Data(data)
+    this.addToHistory(data)
 
   # History management
   addToHistory: (historyItem) ->
@@ -56,45 +57,40 @@ class CommandZ
     this.handleStatusChange()
 
   undo: (times=1) ->
-    return unless this.status().canUndo
+    { canUndo } = this.status()
+    return unless canUndo
 
     for i in [1..times]
-      return unless @history[@index]
+      return unless historyItem = @history[@index]
 
-      historyItem = @history[@index]
-      this.down(command) if command = historyItem.command
+      # Action
+      historyItem.down() if historyItem instanceof CommandZ.Action
 
-      # Has to be after a command item, but before a data item
+      # Has to be after an action item
+      # but before a data item
       @index--
+      historyItem = @history[@index]
 
-      if historyItem = @history[@index]
-        this.handleData(data) if data = historyItem.data
+      # Data
+      this.handleData(historyItem.data) if historyItem instanceof CommandZ.Data
 
       this.handleStatusChange()
 
   redo: (times=1) ->
-    return unless this.status().canRedo
+    { canRedo } = this.status()
+    return unless canRedo
 
     for i in [1..times]
       return unless @history[@index + 1]
 
-      # Has to be before both a command and a data item
+      # Has to be before both an action and a data item
       @index++
-
       historyItem = @history[@index]
-      this.up(command) if command = historyItem.command
-      this.handleData(data) if data = historyItem.data
+
+      historyItem.up() if historyItem instanceof CommandZ.Action
+      this.handleData(historyItem.data) if historyItem instanceof CommandZ.Data
 
       this.handleStatusChange()
-
-  # Execute up/down action on a command
-  # command can be a group of commands or a single command
-  exec: (action, command) ->
-    return command[action]() unless command instanceof Array
-    c[action]() for c in command
-
-  up:   (command) -> this.exec('up',   command)
-  down: (command) -> this.exec('down', command)
 
   # Send current history item data
   handleData: (data) ->
@@ -129,8 +125,25 @@ class CommandZ
     first = @history[0]
     return { canUndo: false, canRedo: false } unless @history.length
 
-    canUndo: if !!first.data then @index > 0 else @index > -1
+    bottomLimit = if first instanceof CommandZ.Action then -1 else 0
+
+    canUndo: @index > bottomLimit
     canRedo: @index < @history.length - 1
 
-# Export singleton
-module.exports = new CommandZ
+# Action
+class CommandZ.Action
+  constructor: (@actions) ->
+    @grouped = @actions instanceof Array
+
+  up:   -> this.upDown('up')
+  down: -> this.upDown('down')
+  upDown: (upDown) ->
+    return @actions[upDown]() unless @grouped
+    action[upDown]() for action in @actions
+
+# Data
+class CommandZ.Data
+  constructor: (@data) ->
+
+# Export
+module.exports = new CommandZ.Client
