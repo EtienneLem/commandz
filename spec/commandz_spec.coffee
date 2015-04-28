@@ -154,15 +154,55 @@ describe 'CommandZ', ->
 
     it 'stores grouped actions', ->
       CommandZ.clear()
+      spies = {}
+      for i in [1..2]
+        spies["spyUp#{i}"] = simple.spy(->)
+        spies["spyDown#{i}"] = simple.spy(->)
+
       CommandZ.execute [
-        { up: (->), down: (->) }
-        { up: (->), down: (->) }
+        { up: spies.spyUp1, down: spies.spyDown1 }
+        { up: spies.spyUp2, down: spies.spyDown2 }
       ]
 
       expect(CommandZ.history.length).to.equal(1)
-      expect(CommandZ.history[0].grouped).to.be.true
-
       expect(CommandZ.index).to.equal(0)
+
+      expect(spies["spyUp#{i}"].calls.length).to.equal(1) for i in [1..2]
+      expect(spies["spyDown#{i}"].calls.length).to.equal(0) for i in [1..2]
+
+      CommandZ.undo()
+      expect(spies["spyUp#{i}"].calls.length).to.equal(1) for i in [1..2]
+      expect(spies["spyDown#{i}"].calls.length).to.equal(1) for i in [1..2]
+
+    it 'handles nested CommandZ actions', ->
+      CommandZ.clear()
+      spies = { spy: simple.spy(->) }
+      for i in [1..3]
+        spies["spyUp#{i}"] = simple.spy(->)
+        spies["spyDown#{i}"] = simple.spy(->)
+
+      CommandZ.execute({ up: (->), down: (->) })
+      CommandZ.execute [
+        CommandZ.execute({ up: spies.spyUp1, down: spies.spyDown1 })
+        CommandZ.execute({ up: spies.spyUp2, down: spies.spyDown2 })
+        { up: spies.spyUp3 , down: spies.spyDown3 }
+      ]
+
+      expect(CommandZ.history.length).to.equal(2)
+      expect(CommandZ.index).to.equal(1)
+
+      expect(spies["spyUp#{i}"].calls.length).to.equal(1) for i in [1..3]
+      expect(spies["spyDown#{i}"].calls.length).to.equal(0) for i in [1..3]
+
+      CommandZ.undo()
+      expect(CommandZ.history.length).to.equal(2)
+      expect(spies["spyUp#{i}"].calls.length).to.equal(1) for i in [1..3]
+      expect(spies["spyDown#{i}"].calls.length).to.equal(1) for i in [1..3]
+
+      CommandZ.redo()
+      expect(CommandZ.history.length).to.equal(2)
+      expect(spies["spyUp#{i}"].calls.length).to.equal(2) for i in [1..3]
+      expect(spies["spyDown#{i}"].calls.length).to.equal(1) for i in [1..3]
 
     it 'registers onStatusChange callback', ->
       onStatusChangeCallback = simple.spy(->)

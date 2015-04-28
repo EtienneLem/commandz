@@ -33,11 +33,23 @@ class CommandZ.Client
     if e.shiftKey then this.redo() else this.undo()
 
   # Execute and store actions
-  execute: (action) ->
-    action = new CommandZ.Action(action)
-    action.up()
+  execute: (actions) ->
+    if Array.isArray(actions)
+      spliceCount = 0
+      for action, i in actions
+        if action instanceof CommandZ.Action
+          spliceCount++
+        else
+          actions[i] = new CommandZ.Action(action)
+          actions[i].up()
 
-    this.addToHistory(action)
+      @history.splice(-spliceCount) if spliceCount
+      historyItem = new CommandZ.Action(actions)
+    else
+      historyItem = new CommandZ.Action(actions)
+      historyItem.up()
+
+    this.addToHistory(historyItem)
 
   # Store data
   store: (data) ->
@@ -55,6 +67,7 @@ class CommandZ.Client
     @index = @history.length - 1
 
     this.handleStatusChange()
+    historyItem
 
   undo: (times=1) ->
     { canUndo } = this.status()
@@ -133,12 +146,12 @@ class CommandZ.Client
 # Action
 class CommandZ.Action
   constructor: (@actions) ->
-    @grouped = @actions instanceof Array
+    @actions = [@actions] unless Array.isArray(@actions)
 
   up:   -> this.upDown('up')
   down: -> this.upDown('down')
+
   upDown: (upDown) ->
-    return @actions[upDown]() unless @grouped
     action[upDown]() for action in @actions
 
 # Data
