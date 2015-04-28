@@ -4,7 +4,19 @@
 describe 'CommandZ', ->
   describe 'commands', ->
     beforeEach ->
-      [0..9].forEach (i) -> CommandZ.execute({ up: (-> i), down: (-> i) })
+      @spies = []
+      [0..9].forEach (i) =>
+        @spies[i] = spy = { up: simple.spy(-> i), down: simple.spy(-> i) }
+        CommandZ.execute(spy)
+
+      this.getSpiesCalls = ->
+        calls = []
+        for spy in @spies
+          calls.push
+            up: spy.up.calls.length
+            down: spy.down.calls.length
+
+        calls
 
     it 'stores commands', ->
       expect(CommandZ.history.length).to.equal(10)
@@ -16,6 +28,19 @@ describe 'CommandZ', ->
       expect(CommandZ.history.length).to.equal(10)
       expect(CommandZ.index).to.equal(5)
 
+      expect(this.getSpiesCalls()).to.deep.equal [
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+      ]
+
     it 'redo', ->
       [0..3].forEach -> CommandZ.undo()
       CommandZ.redo()
@@ -23,14 +48,53 @@ describe 'CommandZ', ->
       expect(CommandZ.history.length).to.equal(10)
       expect(CommandZ.index).to.equal(6)
 
+      expect(this.getSpiesCalls()).to.deep.equal [
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 2, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+      ]
+
     it 'undo many times', ->
       CommandZ.undo(3)
       expect(CommandZ.history.length).to.equal(10)
       expect(CommandZ.index).to.equal(6)
 
+      expect(this.getSpiesCalls()).to.deep.equal [
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 0 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+      ]
+
       CommandZ.undo(100)
       expect(CommandZ.history.length).to.equal(10)
       expect(CommandZ.index).to.equal(-1)
+
+      expect(this.getSpiesCalls()).to.deep.equal [
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+      ]
 
     it 'redo many times', ->
       CommandZ.undo(100)
@@ -38,9 +102,35 @@ describe 'CommandZ', ->
       expect(CommandZ.history.length).to.equal(10)
       expect(CommandZ.index).to.equal(2)
 
+      expect(this.getSpiesCalls()).to.deep.equal [
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+        { up: 1, down: 1 }
+      ]
+
       CommandZ.redo(100)
       expect(CommandZ.history.length).to.equal(10)
       expect(CommandZ.index).to.equal(9)
+
+      expect(this.getSpiesCalls()).to.deep.equal [
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+        { up: 2, down: 1 }
+      ]
 
     it 'returns current status', ->
       status = CommandZ.status()

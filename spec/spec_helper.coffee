@@ -6,6 +6,7 @@ simple = require('simple-mock')
 # Chai
 chai = require('chai')
 chai.use(require('chai-as-promised'))
+chai.config.truncateThreshold = 0
 
 # Mocha
 afterEach ->
