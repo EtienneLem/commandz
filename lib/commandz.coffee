@@ -26,7 +26,8 @@ class CommandZ.Client
     document[addOrRemove]('keydown', this.handleKeypress)
 
   handleKeypress: (e) =>
-    return if document.activeElement.nodeName is 'INPUT'
+    nodeName = document.activeElement.nodeName
+    return if nodeName is 'INPUT' || nodeName is 'TEXTAREA'
     return unless (e.which is 90 and e.metaKey is true || e.which is 26 and e.ctrlKey is true)
 
     e.preventDefault()
