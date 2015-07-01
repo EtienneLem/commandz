@@ -62,7 +62,7 @@ CommandZ.execute({
   down: function() { console.log('down 2') }
 }) // => up 2
 
-console.log(CommandZ.commands.length) // => 2
+console.log(CommandZ.history.length) // => 2
 console.log(CommandZ.index)           // => 1
 ```
 
@@ -81,7 +81,7 @@ for (var i=1; i <= 5; i++) {
 
 CommandZ.execute(commands) // => up 1.1, up 1.2, up 1.3, up 1.4, up 1.5
 
-console.log(CommandZ.commands.length) // => 1
+console.log(CommandZ.history.length) // => 1
 console.log(CommandZ.index)           // => 0
 ```
 
@@ -101,12 +101,12 @@ CommandZ.execute({
 
 CommandZ.undo() // => down 2
 
-console.log(CommandZ.commands.length) // => 2
+console.log(CommandZ.history.length) // => 2
 console.log(CommandZ.index)           // => 0
 
 CommandZ.undo() // => down 1
 
-console.log(CommandZ.commands.length) // => 2
+console.log(CommandZ.history.length) // => 2
 console.log(CommandZ.index)           // => -1
 ```
 
@@ -127,7 +127,7 @@ CommandZ.execute({
 CommandZ.undo(2) // => down 2, down 1
 CommandZ.redo()  // => up 1
 
-console.log(CommandZ.commands.length) // => 2
+console.log(CommandZ.history.length) // => 2
 console.log(CommandZ.index)           // => 0
 ```
 
@@ -149,14 +149,14 @@ CommandZ.onStorageChange(function(data) {
 CommandZ.store({ width: 100, height: 100 })
 CommandZ.undo()
 
-console.log(CommandZ.commands.length) // => 1
+console.log(CommandZ.history.length) // => 1
 console.log(CommandZ.index)           // => -1
 
 CommandZ.store({ width: 100, height: 100 })
 CommandZ.store({ width: 200, height: 200 })
 CommandZ.undo() // => { width: 100, height: 100 }
 
-console.log(CommandZ.commands.length) // => 2
+console.log(CommandZ.history.length) // => 2
 console.log(CommandZ.index)           // => 0
 ```
 
@@ -173,7 +173,7 @@ CommandZ.store({ width: 200, height: 200 })
 CommandZ.undo() // => { width: 100, height: 100 }
 CommandZ.redo() // => { width: 200, height: 200 }
 
-console.log(CommandZ.commands.length) // => 2
+console.log(CommandZ.history.length) // => 2
 console.log(CommandZ.index)           // => 1
 ```
 
@@ -212,7 +212,7 @@ CommandZ.execute({
 }) // => up 2
 
 console.log(CommandZ.status())        // => { canUndo: true, canRedo: false }
-console.log(CommandZ.commands.length) // => 2
+console.log(CommandZ.history.length) // => 2
 console.log(CommandZ.index)           // => 1
 ```
 
@@ -269,7 +269,7 @@ CommandZ.execute({
 CommandZ.clear()
 
 console.log(CommandZ.status())        // => undefined
-console.log(CommandZ.commands.length) // => 0
+console.log(CommandZ.history.length) // => 0
 console.log(CommandZ.index)           // => -1
 ```
 
@@ -320,7 +320,7 @@ CommandZ.execute({
 })
 
 console.log($container.html())        // => <i>1</i><i>2</i><i>1337</i>
-console.log(CommandZ.commands.length) // => 3
+console.log(CommandZ.history.length) // => 3
 console.log(CommandZ.index)           // => 2
 ```
 
