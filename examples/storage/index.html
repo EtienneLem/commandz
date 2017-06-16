@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CommandZ: Storage example</title>
+  <style>
+    body { font-family: Arial, sans-serif }
+    .current { color: green }
+  </style>
+</head>
+<body>
+  <form id="form">
+    <input id="width" placeholder="width" oninput="javascript: handleInput('width')">
+    x
+    <input id="height" placeholder="height" oninput="javascript: handleInput('height')">
+    <input type="submit" value="Set">
+  </form>
+
+  <ul id="list"></ul>
+
+  <a id='undo' href="javascript: CommandZ.undo()">Undo</a>
+  <a id='redo' href="javascript: CommandZ.redo()">Redo</a>
+
+  <p><img id="img" src="http://dl.dropboxusercontent.com/u/2822913/gifs/what.gif" width="400" height="215"></p>
+
+  <script src="http://zeptojs.com/zepto.min.js"></script>
+  <script src="/build/storage_example.js"></script>
+</body>
+</html>
