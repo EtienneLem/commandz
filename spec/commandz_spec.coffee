@@ -219,6 +219,21 @@ describe 'CommandZ', ->
       CommandZ.redo()
       expect(spy.calls.length).to.equal(3)
 
+    it 'handles null action', ->
+      CommandZ.clear()
+
+      CommandZ.execute(null)
+      expect(CommandZ.history.length).to.equal(0)
+      expect(CommandZ.index).to.equal(-1)
+
+      CommandZ.execute([null, null])
+      expect(CommandZ.history.length).to.equal(0)
+      expect(CommandZ.index).to.equal(-1)
+
+      CommandZ.execute([null, { up: (->), down: (->) }])
+      expect(CommandZ.history.length).to.equal(1)
+      expect(CommandZ.index).to.equal(0)
+
     it 'registers onStatusChange callback', ->
       onStatusChangeCallback = simple.spy(->)
       CommandZ.onStatusChange (status) -> onStatusChangeCallback('test')

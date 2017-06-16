@@ -37,16 +37,26 @@ class CommandZ.Client
   execute: (actions) ->
     if Array.isArray(actions)
       spliceCount = 0
+      nullActions = []
       for action, i in actions
+        if !action
+          nullActions.push(i)
+          continue
+
         if action instanceof CommandZ.Action
           spliceCount++
         else
           actions[i] = new CommandZ.Action(action)
           actions[i].up()
 
+      for i in nullActions by -1
+        actions.splice(i, 1)
+
+      return unless actions.length
       @history.splice(-spliceCount) if spliceCount
       historyItem = new CommandZ.Action(actions)
     else
+      return unless actions
       historyItem = new CommandZ.Action(actions)
       historyItem.up()
 
