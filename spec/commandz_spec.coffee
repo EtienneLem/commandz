@@ -204,6 +204,21 @@ describe 'CommandZ', ->
       expect(spies["spyUp#{i}"].calls.length).to.equal(2) for i in [1..3]
       expect(spies["spyDown#{i}"].calls.length).to.equal(1) for i in [1..3]
 
+    it 'handles functions', ->
+      CommandZ.clear()
+      spy = simple.spy(->)
+
+      CommandZ.execute(spy)
+      expect(CommandZ.history.length).to.equal(1)
+      expect(CommandZ.index).to.equal(0)
+      expect(spy.calls.length).to.equal(1)
+
+      CommandZ.undo()
+      expect(spy.calls.length).to.equal(2)
+
+      CommandZ.redo()
+      expect(spy.calls.length).to.equal(3)
+
     it 'registers onStatusChange callback', ->
       onStatusChangeCallback = simple.spy(->)
       CommandZ.onStatusChange (status) -> onStatusChangeCallback('test')

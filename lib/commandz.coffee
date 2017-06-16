@@ -153,11 +153,23 @@ class CommandZ.Action
   down: -> this.upDown('down')
 
   upDown: (upDown) ->
-    action[upDown]() for action in @actions
+    for action in @actions
+      if _isFunction(action)
+        action.call()
+      else
+        action[upDown]()
 
 # Data
 class CommandZ.Data
   constructor: (@data) ->
+
+# Utils
+# _isFunction
+# https://github.com/jashkenas/underscore/blob/20e7c6e/underscore.js#L1333-L1340
+if typeof /./ != 'function' && typeof Int8Array != 'object' && typeof document.childNodes != 'function'
+  _isFunction = (obj) -> typeof obj == 'function'
+else
+  _isFunction = (obj) -> toString.call(action) == '[object Function]'
 
 # Export
 module.exports = new CommandZ.Client
