@@ -39,7 +39,7 @@ class CommandZ.Client
       spliceCount = 0
       nullActions = []
       for action, i in actions
-        if !action
+        if !action || (!_isFunction(action) && (!action.up && !action.down))
           nullActions.push(i)
           continue
 
@@ -56,7 +56,7 @@ class CommandZ.Client
       @history.splice(-spliceCount) if spliceCount
       historyItem = new CommandZ.Action(actions)
     else
-      return unless actions
+      return if !actions || (!_isFunction(actions) && (!actions.up && !actions.down))
       historyItem = new CommandZ.Action(actions)
       historyItem.up()
 
@@ -164,9 +164,10 @@ class CommandZ.Action
 
   upDown: (upDown) ->
     for action in @actions
+      continue unless action
       if _isFunction(action)
         action.call()
-      else
+      else if _isFunction(action[upDown])
         action[upDown]()
 
 # Data

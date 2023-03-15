@@ -234,6 +234,14 @@ describe 'CommandZ', ->
       expect(CommandZ.history.length).to.equal(1)
       expect(CommandZ.index).to.equal(0)
 
+      CommandZ.execute({ up: null, down: null })
+      expect(CommandZ.history.length).to.equal(1)
+      expect(CommandZ.index).to.equal(0)
+
+      CommandZ.execute([{ up: null, down: null }])
+      expect(CommandZ.history.length).to.equal(1)
+      expect(CommandZ.index).to.equal(0)
+
     it 'registers onStatusChange callback', ->
       onStatusChangeCallback = simple.spy(->)
       CommandZ.onStatusChange (status) -> onStatusChangeCallback('test')
