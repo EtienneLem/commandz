@@ -12,25 +12,30 @@ var webpackFor = function(target) {
 
   configs = webpackConfig[target]
   if (!Array.isArray(configs)) { configs = [configs] }
+  const streams = []
 
   for (var i = 0; i < configs.length; i++) {
     config = configs[i]
 
-    webpack(config)
-      .pipe(gulp.dest(target))
+    streams.push(
+      webpack(config)
+        .pipe(gulp.dest(target))
+    )
   }
+
+  return streams
 }
 
 gulp.task('build', function () {
-  webpackFor('build')
+  return Promise.all(webpackFor('build'))
 });
 
 gulp.task('dist', function() {
-  webpackFor('dist')
+  return Promise.all(webpackFor('dist'))
 })
 
 gulp.task('serve', function () {
-  connect.server({
+  return connect.server({
     port: port,
     livereload: {
       port: reloadPort
@@ -44,7 +49,7 @@ gulp.task('reload-js', function () {
 });
 
 gulp.task('watch', function () {
-  gulp.watch(['./build/*.js'], ['reload-js']);
+  gulp.watch(['./build/*.js'], gulp.task('reload-js'));
 });
 
-gulp.task('default', ['build', 'serve', 'watch']);
+gulp.task('default', gulp.parallel('build', 'serve', 'watch'));
