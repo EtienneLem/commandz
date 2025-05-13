@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CommandZ: Commands example</title>
+  <style>
+    i + i { margin-left: .1em }
+    i + i:before { content: ', '; }
+  </style>
+</head>
+<body>
+  <div></div>
+  <a id='undo' href="javascript: CommandZ.undo()">Undo</a>
+  <a id='do'   href="javascript: add()">Add</a>
+  <a id='redo' href="javascript: CommandZ.redo()">Redo</a>
+
+  <script src="http://zeptojs.com/zepto.min.js"></script>
+  <script src="/build/commands_example.js"></script>
+</body>
+</html>
