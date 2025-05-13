@@ -1,6 +1,6 @@
 {
-  "name": "commandz",
-  "version": "0.2.0",
+  "name": "@missive/commandz",
+  "version": "1.0.0",
   "description": "⌘Z add commands history support to your web ap",
   "main": "dist/commandz.min.js",
   "repository": {
